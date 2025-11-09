@@ -23,152 +23,160 @@ export default function Landing() {
 
   const heroSection = () => {
     return (
-      <section
-        className="relative flex items-center justify-center h-screen bg-cover bg-center -mt-18"
-        style={{
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2)), url('/unnamed.png')`,
-        }}
-      >
-        <div className="absolute inset-0 bg-black opacity-50"></div>
-        <div className="relative z-10 text-center text-white max-w-3xl px-6">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
-            Your Portal to a <br />
-            <span className="inline-block uppercase text-5xl font-bold mt-4 leading-tight text-primarydark">
+      <section className="bg-gradient-to-r from-blue-200 to-[#22435b] min-h-screen flex items-center py-12 px-8 md:px-16 lg:px-24">
+      <div className="max-w-7xl mx-auto w-full flex flex-col-reverse md:flex-row items-center justify-between gap-16 mt-25">
+        
+   
+        <div className="flex-1 text-center md:text-left space-y-6">
+          <div>
+            <p className="text-5xl font-semibold text-gray-900 mb-6">
+              Your portal for
+            </p>
+            <h1 className="text-3xl md:text-5xl font-bold leading-tight">
               <span
                 key={currentTextIndex}
-                className="inline-block bg-gradient-to-r from-blue-500 to-white text-transparent bg-clip-text px-3 py-1 rounded-md animate-fadeIn"
+                className="inline-block bg-gradient-to-r from-[#1B3C53] to-blue-800 text-transparent bg-clip-text  text-6xl"
               >
-                {rotatingTexts[currentTextIndex]}
+               
+                A Better Hostel Life
               </span>
-            </span>
-          </h1>
+            </h1>
+          </div>
 
-          <p className="mb-6 text-lg text-gray-200">
-            Connect with roommates, manage hostel life, and get support when you
-            need it. Welcome to the HostelEzz community.
+          <p className="text-gray-800 text-base md:text-lg max-w-xl mx-auto md:mx-0 leading-relaxed">
+            A unified hostel management system that matches students with <p className="text-black inline font-bold"> compatible roommates</p> based on preferences.
+Streamlines complaints and mess feedback .
           </p>
-          <div className="flex flex-col md:flex-row gap-4 justify-center">
-            <a
-              href="/SignUp"
-              className="bg-[#1d2f6d] text-white px-8 py-3 rounded-xl font-semibold shadow-lg border border-transparent 
-               hover:bg-white hover:text-black hover:scale-105 hover:shadow-2xl transition-all duration-300 ease-in-out"
-            >
-              Sign Up
-            </a>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start pt-4">
             <a
               href="/Login"
-              className="bg-white text-black px-8 py-3 rounded-xl font-semibold shadow-lg border border-transparent 
-               hover:bg-[#1d2f6d] hover:text-white hover:scale-105 hover:shadow-2xl transition-all duration-300 ease-in-out"
+              className="bg-[#1B3C53] text-white px-8 py-3 rounded-lg font-semibold shadow-md 
+              hover:bg-blue-700 transition-all duration-300 ease-in-out"
             >
-              Login
+              Let's Get started
             </a>
+            
           </div>
         </div>
-      </section>
+
+        <div className="flex-1 flex justify-center items-center mb-12">
+          <img
+            src="/student_accomodation1.png"
+            alt="Hostel Management Illustration"
+            className="max-w-lg w-full"
+          />
+        </div>
+      </div>
+    </section>
+
     );
   };
 
   const featureSection = () => {
     return (
-       <section id="features" className="py-20 bg-black/10">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Everything You Need for Hostel Living</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              From finding compatible roommates to addressing maintenance requests, our platform is designed to improve your hostel life.
-            </p>
+       <section id="features" className="py-20 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-6">
+   
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            Everything You Need for Hostel Living
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            From finding compatible roommates to addressing maintenance requests, 
+            our platform is designed to improve your hostel life.
+          </p>
+        </div>
+
+        {/* Features*/}
+        <div className="space-y-12">
+   
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center border border-gray-300 rounded-2xl p-8 bg-white shadow-sm hover:shadow-md transition-shadow duration-300">
+            <div className="w-full aspect-[592/320] bg-gray-200 rounded-xl flex items-center justify-center overflow-hidden">
+              <div className="text-center text-gray-400">
+                <div className="rounded-xl hover:scale-105 hover:shadow-2xl transition duration-200 ease-in-out cursor-pointer">
+                  <img src="/studentmatch.png" alt="" />
+                </div>
+             
+              </div>
+            </div>
+            <div className="space-y-4">
+              <h3 className="text-3xl font-bold text-gray-900">
+                Intelligent Roommate Matching
+              </h3>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                Our advanced algorithm analyzes your lifestyle preferences, study habits, 
+                and personality traits to connect you with the most compatible roommates.
+              </p>
+              <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+                <span className="flex items-center">
+                  ✓ Personality Analysis
+                </span>
+                <span className="flex items-center">
+                  ✓ Smart Matching
+                </span>
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-20">
-            {/* Feature 1 - Image Left, Text Right */}
-            <div className="grid grid-cols-2 gap-12 items-center">
-              <div className="w-full">
-                <div className="relative group">
-                  <div className="w-full h-80 bg-gradient-to-br from-blue-800 to-blue-600 rounded-2xl shadow-2xl flex items-center justify-center transform group-hover:scale-105 transition-transform duration-500">
-                    <div className="text-center text-white p-8">
-                      <div className="text-8xl mb-4">👥</div>
-                      <h4 className="text-2xl font-bold mb-2">Roommate Matching</h4>
-                      <p className="text-blue-100">Find Your Perfect Match</p>
-                    </div>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-purple-500/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </div>
-              </div>
-              <div className="w-full space-y-6">
-                <h3 className="text-3xl font-bold text-gray-900">Intelligent Roommate Matching</h3>
-                <p className="text-lg text-gray-600 leading-relaxed">
-                  Our advanced algorithm analyzes your lifestyle preferences, study habits, and personality traits to connect you with the most compatible roommates.
-                </p>
-                <div className="flex space-x-4 text-sm text-gray-500">
-                  <span className="flex items-center">✓ Personality Analysis</span>
-                  <span className="flex items-center">✓ Smart Matching</span>
-                </div>
-                <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full font-semibold hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg">
-                  Find Your Perfect Match
-                </button>
+      
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center border border-gray-300 rounded-2xl p-8 bg-white shadow-sm hover:shadow-md transition-shadow duration-300">
+            <div className="space-y-4">
+              <h3 className="text-3xl font-bold text-gray-900">
+                Easy Issue Reporting
+              </h3>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                Report maintenance issues, complaints, or requests instantly through 
+                our intuitive mobile interface. Track resolution progress in real-time.
+              </p>
+              <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+                <span className="flex items-center">
+                  ✓ Real-time Tracking
+                </span>
+                <span className="flex items-center">
+                  ✓ Instant Notifications
+                </span>
               </div>
             </div>
-
-            {/* Feature 2 - Text Left, Image Right */}
-            <div className="grid grid-cols-2 gap-12 items-center">
-              <div className="w-full space-y-6">
-                <h3 className="text-3xl font-bold text-gray-900">Easy Issue Reporting</h3>
-                <p className="text-lg text-gray-600 leading-relaxed">
-                  Report maintenance issues, complaints, or requests instantly through our intuitive mobile interface. Track resolution progress in real-time.
-                </p>
-                <div className="flex space-x-4 text-sm text-gray-500">
-                  <span className="flex items-center">✓ Real-time Tracking</span>
-                  <span className="flex items-center">✓ Instant Notifications</span>
+            <div className="w-full aspect-[592/320] bg-gray-200 rounded-xl flex items-center justify-center overflow-hidden">
+              <div className="text-center text-gray-400">
+                <div className="rounded-xl hover:scale-105 hover:shadow-2xl transition duration-200 ease-in-out cursor-pointer">
+                    <img src="/issuereporting.png" alt="" />
                 </div>
-                <button className="bg-gradient-to-r from-purple-800 to-purple-600 text-white px-8 py-3 rounded-full font-semibold hover:from-purple-900 hover:to-purple-500 transform hover:scale-105 transition-all duration-300 shadow-lg">
-                  Report an Issue
-                </button>
-              </div>
-              <div className="w-full">
-                <div className="relative group">
-                  <div className="w-full h-80 bg-gradient-to-br from-purple-800 to-purple-600 rounded-2xl shadow-2xl flex items-center justify-center transform group-hover:scale-105 transition-transform duration-500">
-                    <div className="text-center text-white p-8">
-                      <div className="text-8xl mb-4">📱</div>
-                      <h4 className="text-2xl font-bold mb-2">Issue Reporting</h4>
-                      <p className="text-red-100">Quick & Easy Solutions</p>
-                    </div>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-tr from-purple-800/30 to-purple-600/30 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </div>
+               
               </div>
             </div>
+          </div>
 
-            {/* Feature 3 - Image Left, Text Right */}
-            <div className="grid grid-cols-2 gap-12 items-center">
-              <div className="w-full">
-                <div className="relative group">
-                  <div className="w-full h-80 bg-gradient-to-br from-gray-600 to-gray-800 rounded-2xl shadow-2xl flex items-center justify-center transform group-hover:scale-105 transition-transform duration-500">
-                    <div className="text-center text-white p-8">
-                      <div className="text-8xl mb-4">🏠</div>
-                      <h4 className="text-2xl font-bold mb-2">Hostel Dashboard</h4>
-                      <p className="text-green-100">Manage Everything</p>
-                    </div>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-tr from-gray-500/20 to-gray-600/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </div>
+        
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center border border-gray-300 rounded-2xl p-8 bg-white shadow-sm hover:shadow-md transition-shadow duration-300">
+            <div className="w-full aspect-[592/320] bg-gray-200 rounded-xl flex items-center justify-center overflow-hidden">
+              <div className="text-center text-gray-400">
+                <div className="rounded-xl hover:scale-105 hover:shadow-2xl transition duration-200 ease-in-out cursor-pointer">  <img src="/simplifiedhostellife.png" alt="" /></div>
+              
               </div>
-              <div className="w-full space-y-6">
-                <h3 className="text-3xl font-bold text-gray-900">Simplified Hostel Life</h3>
-                <p className="text-lg text-gray-600 leading-relaxed">
-                  Access your personalized dashboard to manage everything from meal planning and study schedules to hostel announcements and community events.
-                </p>
-                <div className="flex space-x-4 text-sm text-gray-500">
-                  <span className="flex items-center">✓ Unified Dashboard</span>
-                  <span className="flex items-center">✓ Community Events</span>
-                </div>
-                <button className="bg-gradient-to-r from-gray-600 to-gray-800 text-white px-8 py-3 rounded-full font-semibold hover:from-gray-500 hover:to-gray-600 transform hover:scale-105 transition-all duration-300 shadow-lg">
-                  Explore Dashboard
-                </button>
+            </div>
+            <div className="space-y-4">
+              <h3 className="text-3xl font-bold text-gray-900">
+                Simplified Hostel Life
+              </h3>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                Access your personalized dashboard to manage everything from meal 
+                planning and study schedules to hostel announcements and community events.
+              </p>
+              <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+                <span className="flex items-center">
+                  ✓ Unified Dashboard
+                </span>
+                <span className="flex items-center">
+                  ✓ Community Events
+                </span>
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
     );
   };
 

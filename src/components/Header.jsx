@@ -6,63 +6,35 @@ const Header = () => {
   const currentPath = location.pathname;
 
   return (
-    <header className="w-full z-20 sticky top-0 left-0 bg-black/30 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-        {/* Logo */}
-        <div className="flex items-center space-x-2">
-          <img src="/logo.jpg" alt="HostelEzz Logo" className="h-8 w-8" />
-          <span className="text-white font-semibold text-lg">
+    <header className="w-full z-20 fixed top-0 left-0 bg-black/40 backdrop-blur-md shadow-lg">
+      <div className="max-w-7xl h-16 mx-auto flex items-center justify-between px-8 py-4">
+     
+        <div className="flex items-center space-x-3">
+          <img src="/logo.jpg" alt="HostelEzz Logo" className="h-10 w-10 rounded-full shadow-md" />
+          <span className="text-white font-bold text-xl tracking-tight">
             <a href="/#hostelezz">HostelEzz</a>
           </span>
         </div>
 
-        {/* Nav Links */}
-        <nav className="hidden md:flex space-x-8 text-white font-medium">
-          <a href="#features" className="hover:text-gray-200">
-            Features
-          </a>
-          <a href="#testimonials" className="hover:text-gray-200">
-            Testimonials
-          </a>
-          <a href="#contact" className="hover:text-gray-200">
-            Contact
-          </a>
-        </nav>
-
-        {/* Auth Buttons (conditional) */}
-        <div className="flex items-center space-x-2">
-          {currentPath === "/login" && (
-            <Link
-              to="/signup"
-              className="bg-white text-gray-900 px-3 py-1.5 text-sm rounded-full font-medium hover:bg-gray-100"
-            >
-              Sign Up
-            </Link>
-          )}
-          {currentPath === "/signup" && (
-            <Link
-              to="/login"
-              className="bg-white text-gray-900 px-3 py-1.5 text-sm rounded-full font-medium hover:bg-gray-100"
-            >
-              Log In
-            </Link>
-          )}
-          {currentPath !== "/login" && currentPath !== "/signup" && (
-            <>
-              <Link
-                to="/login"
-                className="bg-white text-gray-900 px-3 py-1.5 text-sm rounded-full font-medium hover:bg-gray-100"
-              >
-                Log In
-              </Link>
-              <Link
-                to="/signup"
-                className="bg-white text-gray-900 px-3 py-1.5 text-sm rounded-full font-medium hover:bg-gray-100"
-              >
-                Sign Up
-              </Link>
-            </>
-          )}
+        <div className="flex items-center space-x-12">
+          <nav className="hidden md:flex space-x-12 text-white font-medium">
+            <a href="#features" className="hover:text-gray-200 transition-colors duration-200">
+              Features
+            </a>
+            <a href="#about" className="hover:text-gray-200 transition-colors duration-200">
+              About Us
+            </a>
+            <a href="#contact" className="hover:text-gray-200 transition-colors duration-200">
+              Contact Us
+            </a>
+          </nav>
+          
+          <Link
+            to="/signup"
+            className="bg-white text-gray-900 px-6 py-2.5 rounded-full font-semibold text-sm hover:bg-gray-100 transition-all duration-200 shadow-md hover:shadow-lg"
+          >
+            Sign Up
+          </Link>
         </div>
       </div>
     </header>
