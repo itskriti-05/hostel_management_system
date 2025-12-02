@@ -49,11 +49,15 @@ export default function SignUp() {
         throw new Error(err || "Failed to register");
       }
 
-      const result = await response.json();
-      console.log("✅ Registration success:", result);
+      const result = await response.json();   // result has "token"
 
-      alert("Account created successfully!");
-       window.location.href = "/dashboard";
+console.log("JWT Token received:", result.token);
+
+localStorage.setItem("authToken", result.token);  // SAVE TOKEN HERE
+localStorage.setItem("userId", result.id);
+localStorage.setItem("role", result.role);
+
+window.location.href = "/dashboard";
 
     } catch (error) {
       console.error("❌ Registration failed:", error);

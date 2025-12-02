@@ -1,24 +1,62 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+// src/App.jsx
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 import Landing from "./pages/Landing/Landing";
-import SignUp from "./pages/StudentSignUp/SignUp"; 
+import SignUp from "./pages/StudentSignUp/SignUp";
 import Login from "./pages/StudentLogin/Login";
-import Footer from "./components/Footer";
-import Header from "./components/Header";
+import Dashboard from "./pages/StudentDashboard/StudentDashboard";
 
-function App() {
+import DefaultLayout from "./layouts/DefaultLayout.jsx";
+import AuthLayout from "./layouts/AuthLayout.jsx";
+import ProtectedRoute from "./components/ProtectedRoute";
+
+export default function App() {
   return (
-    <Router>
-      <Header/>
+    <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/login" element={<Login />} />
-      </Routes>
-      <Footer />
-    </Router>
-    
 
+        {/* Public pages use DefaultLayout */}
+        <Route
+          path="/"
+          element={
+            <DefaultLayout>
+              <Landing />
+            </DefaultLayout>
+          }
+        />
+
+        {/* Auth pages without header/footer */}
+        <Route
+          path="/signup"
+          element={
+            <AuthLayout>
+              <SignUp />
+            </AuthLayout>
+          }
+        />
+
+        <Route
+          path="/login"
+          element={
+            <AuthLayout>
+              <Login />
+            </AuthLayout>
+          }
+        />
+
+        {/* Protected dashboard (no header/footer) */}
+        <Route
+          path="/dashboard"
+          element={
+            <AuthLayout>
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            </AuthLayout>
+          }
+        />
+
+      </Routes>
+    </BrowserRouter>
   );
 }
-
-export default App;
