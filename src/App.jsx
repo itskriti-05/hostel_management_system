@@ -15,7 +15,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
 
-        {/* Public pages use DefaultLayout */}
+    
         <Route
           path="/"
           element={
@@ -25,7 +25,7 @@ export default function App() {
           }
         />
 
-        {/* Auth pages without header/footer */}
+   
         <Route
           path="/signup"
           element={
@@ -44,7 +44,7 @@ export default function App() {
           }
         />
 
-        {/* Protected dashboard (no header/footer) */}
+
         <Route
           path="/dashboard"
           element={
