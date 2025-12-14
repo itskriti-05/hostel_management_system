@@ -20,41 +20,65 @@ const WardenDashboard = () => {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${getAuthToken()}`
   });
+useEffect(() => {
+  const token = getAuthToken();
+  let role = localStorage.getItem("role");
+
+  // normalize role
+  try {
+    if (role?.startsWith("[")) {
+      const parsed = JSON.parse(role);
+      role = Array.isArray(parsed) ? parsed[0] : parsed;
+      localStorage.setItem("role", role);
+    }
+  } catch {}
+
+  console.log("🔐 TOKEN FOUND:", token);
+  console.log("🔐 ROLE FOUND:", role);
+
+  if (!token) {
+    console.error("❌ No token found. Redirecting to login.");
+    window.location.href = "/login";
+    return;
+  }
+
+  if (role !== "ROLE_WARDEN") {
+    console.error("❌ Unauthorized role:", role);
+    window.location.href = "/login";
+    return;
+  }
+}, []);
+
+
 
   // Data state (kept same variable names)
   const [dashboardData, setDashboardData] = useState({
-    totalStudents: 1,
-    studentGrowth: '',
-    pendingComplaints: 1,
-    urgentComplaints: 0,
-    inProgressComplaints: 0,
-    averageRating: 0,
-    maxRating: 5,
-    todayRating: 0,
-    pendingMatches: 0,
-    completedMatches: 0  });
+  totalStudents: 0,
+  studentGrowth: '',
+  pendingComplaints: 0,
+  urgentComplaints: 0,
+  inProgressComplaints: 0,
+  averageRating: 0,
+  maxRating: 5,
+  todayRating: 0,
+  pendingMatches: 0,
+  completedMatches: 0
+});
 
-  const [wardenProfile, setWardenProfile] = useState({
-    id: 'W001',
-    name: 'Priyanka Chaudhary',
-    email: 'priyanka@gmail.com',
-    contactNo: '+91 98765 43210',
-    hostelType: 'GIRLS'
-  });
+const [wardenProfile, setWardenProfile] = useState({
+  id: '',
+  name: '',
+  email: '',
+  contactNo: '',
+  hostelType: ''
+});
 
-  const [notifications, setNotifications] = useState([
-    { id: 1, message: 'New complaint registered', time: '5 min ago', unread: true },
-    { id: 2, message: '3 roommate matches pending', time: '1 hour ago', unread: true },
-    { id: 3, message: 'New student registration', time: '2 hours ago', unread: false }
-  ]);
 
-  const [students, setStudents] = useState([
-    { id: 1, name: 'Devina', room: '102-B', date: 'Oct 24, 2023', status: 'Active', avatar: '👩' }
-    // { id: 2, name: 'Sarah ', room: '205-A', date: 'Oct 23, 2023', status: 'Pending', avatar: '👩' },
-    // { id: 3, name: 'Devina', room: '--', date: 'Oct 23, 2023', status: 'Unassigned', avatar: '👨' },
-    // { id: 4, name: 'Gargie', room: '301-C', date: 'Oct 22, 2023', status: 'Active', avatar: '👩' },
-    // { id: 5, name: 'Kritika', room: '104-A', date: 'Oct 21, 2023', status: 'Active', avatar: '👨' }
-  ]);
+  const [notifications, setNotifications] = useState([]);
+
+
+  const [students, setStudents] = useState([]);
+
 
   const [staffForm, setStaffForm] = useState({
     name: '',
