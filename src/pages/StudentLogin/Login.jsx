@@ -51,43 +51,58 @@ export default function Login() {
   };
 
   const handleSubmit = async () => {
-    console.log("Login Data", formData);
-    try {
-      const response = await fetch("http://localhost:8080/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
-      if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(errText || "Login failed");
-      }
+  try {
+    const response = await fetch("http://localhost:8080/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: formData.email,
+        password: formData.password,
+      }),
+    });
 
-      const result = await response.json();
-      console.log("email:", formData.email);
-      console.log("token:", formData.token);
-      console.log("role:",formData.role);
-      // console.log("rolevalue:",formData.role[0]);
-
-
-      console.log("✅ Login success:", result);
-
-      if (result.token) {
-        localStorage.setItem("token", result.token);
-      }
-
-      alert("Login successful!");
-      window.location.href = "/WardenDashboard";
-    } catch (error) {
-      console.error("❌ Login failed:", error);
-      alert("Error: " + error.message);
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(errText || "Login failed");
     }
-  };
+
+    const result = await response.json();
+
+    // 🔥 CLEAR OLD DATA
+    localStorage.clear();
+
+    // 🔥 EXTRACT ROLE SAFELY
+    const extractedRole = Array.isArray(result.role)
+      ? (typeof result.role[0] === "string"
+          ? result.role[0]
+          : result.role[0]?.authority)
+      : result.role;
+
+    // 🔥 STORE AUTH DATA
+    localStorage.setItem("authToken", result.token);
+    localStorage.setItem("email", result.email);
+    localStorage.setItem("role", extractedRole);
+
+    console.log("LOGIN ROLE:", extractedRole);
+
+    alert("Login successful!");
+
+    // 🔥 ROLE-BASED REDIRECT
+    if (extractedRole === "ROLE_WARDEN" || extractedRole === "ROLE_STAFF" ) {
+      window.location.href = "/warden-dashboard";
+    } else if (extractedRole === "ROLE_STUDENT") {
+      window.location.href = "/student-dashboard";
+    } else {
+      alert("Unauthorized role");
+      window.location.href = "/login";
+    }
+
+  } catch (error) {
+    console.error("Login failed:", error);
+    alert(error.message);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gray-50" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>

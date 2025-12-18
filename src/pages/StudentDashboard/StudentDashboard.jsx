@@ -17,6 +17,24 @@ const StudentDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [showComplaintModal, setShowComplaintModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+ const [setPreferenceModal, setSetPreferenceModal] = useState(false);
+ const [roomTypeOptions, setRoomTypeOptions] = useState([]);
+const ROOM_TYPE_MAP = {
+  1: "ONE",
+  2: "TWO",
+  3: "THREE"
+};
+
+
+  const [preferenceForm, setPreferenceForm] = useState({
+    scheduleType: null,
+    cleanlinessLevel: null,
+    noisePreference: null,
+    studyPreference: null,
+    allergy: null,
+    roomTempPreference: null,
+    roomType : ''
+  });
 
   const [complaintForm, setComplaintForm] = useState({
     title: '',
@@ -210,6 +228,71 @@ const StudentDashboard = () => {
   const pendingCount = complaints.filter(c => c.status === 'PENDING').length;
   const resolvedCount = complaints.filter(c => c.status === 'RESOLVED').length;
 
+ const submitPreference = async () => {
+    if (!preferenceForm.scheduleType || !preferenceForm.cleanlinessLevel || 
+        !preferenceForm.noisePreference || !preferenceForm.studyPreference || 
+        !preferenceForm.allergy || !preferenceForm.roomType ||        !preferenceForm.roomTempPreference) {
+      alert("Please fill all fields");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/preference`, {
+        method: "POST",
+        headers: authHeaders,
+        body: JSON.stringify(preferenceForm)
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Error response:", errorText);
+        alert("Error occurred. You may have already submitted preferences or your profile is incomplete.");
+        return;
+      }
+
+      alert("Preferences saved successfully");
+      setSetPreferenceModal(false);
+      setPreferenceForm({
+        scheduleType: null,
+        cleanlinessLevel: null,
+        noisePreference: null,
+        studyPreference: null,
+        allergy: null,
+        roomTempPreference: null
+      });
+
+    } catch (error) {
+      console.log("Error submitting preference", error);
+      alert("Something went wrong");
+    }
+  };
+
+
+
+const fetchRoomTypes = async () => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/preference/room-type`, {
+      headers: authHeaders
+    });
+
+    console.log("Room type status:", res.status);
+
+    if (!res.ok) {
+      const err = await res.text();
+      console.error("Room type error:", err);
+      return;
+    }
+
+    const data = await res.json();
+    console.log("Room types:", data); // MUST be [1,2,3]
+
+    setRoomTypeOptions(data);
+  } catch (err) {
+    console.error("Failed to fetch room types", err);
+  }
+};
+
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm">
@@ -324,6 +407,147 @@ const StudentDashboard = () => {
 
         <div className="mb-6">
           <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
+      {setPreferenceModal && (
+        <div className="fixed inset-0 bg-gray-100 bg-opacity-40 flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-xl shadow-lg max-w-xl w-full my-8">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-2xl font-bold text-gray-900">Set Room Preferences</h2>
+                <button
+                  onClick={() => setSetPreferenceModal(false)}
+                  className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 p-1 rounded-full transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              <p className="text-sm text-gray-600">Fill out all fields and save your preferences.</p>
+            </div>
+
+            <div className="p-6 space-y-5">
+              <div>
+                <label className="block text-sm font-semibold mb-2">Schedule Type</label>
+                <select
+                  value={preferenceForm.scheduleType || ""}
+                  onChange={(e) => setPreferenceForm({ ...preferenceForm, scheduleType: e.target.value || null })}
+                  className="w-full px-4 py-2.5 border rounded-lg text-sm"
+                >
+                  <option value="">Select</option>
+                  <option value="MORNING_PERSON">Morning Person</option>
+                  <option value="NIGHT_PERSON">Night Person</option>
+                  <option value="FLEXIBLE">Flexible</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2">Cleanliness Level</label>
+                <select
+                  value={preferenceForm.cleanlinessLevel || ""}
+                  onChange={(e) => setPreferenceForm({ ...preferenceForm, cleanlinessLevel: e.target.value || null })}
+                  className="w-full px-4 py-2.5 border rounded-lg text-sm"
+                >
+                  <option value="">Select</option>
+                  <option value="HIGH">High</option>
+                  <option value="MEDIUM">Medium</option>
+                  <option value="LOW">Low</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2">Noise Preference</label>
+                <select
+                  value={preferenceForm.noisePreference || ""}
+                  onChange={(e) => setPreferenceForm({ ...preferenceForm, noisePreference: e.target.value || null })}
+                  className="w-full px-4 py-2.5 border rounded-lg text-sm"
+                >
+                  <option value="">Select</option>
+                  <option value="QUIET">Quiet</option>
+                  <option value="OKAY">Okay</option>
+                  <option value="NOISY">Noisy</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2">Study Preference</label>
+                <select
+                  value={preferenceForm.studyPreference || ""}
+                  onChange={(e) => setPreferenceForm({ ...preferenceForm, studyPreference: e.target.value || null })}
+                  className="w-full px-4 py-2.5 border rounded-lg text-sm"
+                >
+                  <option value="">Select</option>
+                  <option value="ALONE">Alone</option>
+                  <option value="GROUP">Group</option>
+                  <option value="FLEXIBLE">Flexible</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2">Allergy</label>
+                <select
+                  value={preferenceForm.allergy || ""}
+                  onChange={(e) => setPreferenceForm({ ...preferenceForm, allergy: e.target.value || null })}
+                  className="w-full px-4 py-2.5 border rounded-lg text-sm"
+                >
+                  <option value="">Select</option>
+                  <option value="DIRT">Dirt</option>
+                  <option value="PERFUME">Perfume</option>
+                  <option value="OTHERS">Others</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2">Room Temperature</label>
+                <select
+                  value={preferenceForm.roomTempPreference || ""}
+                  onChange={(e) => setPreferenceForm({ ...preferenceForm, roomTempPreference: e.target.value || null })}
+                  className="w-full px-4 py-2.5 border rounded-lg text-sm"
+                >
+                  <option value="">Select</option>
+                  <option value="CHILLED">Chilled</option>
+                  <option value="COOL">Cool</option>
+                  <option value="NORMAL">Normal</option>
+                  <option value="FLEXIBLE">Flexible</option>
+                </select>
+              </div>
+              
+             <div>
+  <label className="block text-sm font-semibold mb-2">Room Type</label>
+  <select
+    value={preferenceForm.roomType || ""}
+    onChange={(e) =>
+      setPreferenceForm({
+        ...preferenceForm,
+        roomType: e.target.value || null
+      })
+    }
+    className="w-full px-4 py-2.5 border rounded-lg text-sm"
+  >
+    <option value="">Select</option>
+
+    {roomTypeOptions.length === 0 && (
+      <option disabled>Loading...</option>
+    )}
+
+    {roomTypeOptions.map((opt) => (
+      <option key={opt} value={["ONE","TWO","THREE"][opt - 1]}>
+        {opt}-Sharing
+      </option>
+    ))}
+  </select>
+</div>
+
+              <button
+                onClick={submitPreference}
+                className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-sm"
+              >
+                Save Preferences
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+     
+
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-white rounded-lg shadow-sm p-5 flex flex-col" style={{minHeight: '280px'}}>
               <div className="flex items-start gap-3 mb-4">
@@ -342,8 +566,16 @@ const StudentDashboard = () => {
                 </svg>
               </div>
               <p className="text-xs text-center text-gray-500 mb-3">Complete your profile to unlock matches.</p>
-              
-              <button className="w-full px-4 py-2 bg-blue-500 text-white rounded text-sm font-medium hover:bg-blue-600 mt-auto">
+              { /*made a setpreferencemodal for this*/
+               }
+              <button 
+              onClick={()=> {
+                 setSetPreferenceModal(true);
+                   fetchRoomTypes();
+              }
+                
+               }
+              className="w-full px-4 py-2 bg-blue-500 text-white rounded text-sm font-medium hover:bg-blue-600 mt-auto">
                 Update Preferences
               </button>
             </div>
@@ -408,7 +640,7 @@ const StudentDashboard = () => {
           </div>
         </div>
       </div>
-
+     
       {showComplaintModal && (
         <div className="fixed inset-0 bg-gray-100 bg-opacity-40 flex items-center justify-center p-4 z-50 overflow-y-auto">
           <div className="bg-white rounded-xl shadow-lg max-w-xl w-full my-8">

@@ -38,7 +38,7 @@ export default function App() {
         />
 
         <Route
-          path="/StudentDashboard"
+          path="/student-dashboard"
           element={
             <AuthLayout>
              
@@ -48,7 +48,7 @@ export default function App() {
           }
         />
         <Route
-          path="/WardenDashboard"
+          path="/warden-dashboard"
           element={
             <AuthLayout>
               <WardenDashboard/>
