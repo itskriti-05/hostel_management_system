@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import {
   UtensilsCrossed,
   MessageSquare,
@@ -34,33 +36,23 @@ const StudentDashboard = () => {
       ],
     },
   });
-
   const [complaints, setComplaints] = useState([]);
   const [feedbacks, setFeedbacks] = useState([]);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showComplaintModal, setShowComplaintModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  const [setPreferenceModal, setSetPreferenceModal] = useState(false);
-  const [showProfileModal, setShowProfileModal] = useState(false);
+  const isProfileComplete = profile?.profileComplete === true;
+  const navigate = useNavigate();
 
-  const [profileForm, setProfileForm] = useState({
-    branch: "",
-    hostelType: "",
-    gender: "",
-    parentContactNo: "",
-    year: 0,
-  });
+  const location = useLocation();
 
-  const [preferenceForm, setPreferenceForm] = useState({
-    scheduleType: null,
-    cleanlinessLevel: null,
-    noisePreference: null,
-    studyPreference: null,
-    allergy: null,
-    roomTempPreference: null,
-    roomType: null,
-  });
+  useEffect(() => {
+    fetchProfile();
+  }, [location.state]);
+
+  console.log("PROFILE STATE:", profile);
+  console.log("PROFILE COMPLETE:", profile?.profileComplete);
 
   const [complaintForm, setComplaintForm] = useState({
     title: "",
@@ -83,6 +75,12 @@ const StudentDashboard = () => {
   };
 
   useEffect(() => {
+    if (profile) {
+      console.log("PROFILE FROM BACKEND:", profile);
+    }
+  }, [profile]);
+
+  useEffect(() => {
     fetchAllData();
   }, []);
 
@@ -102,50 +100,51 @@ const StudentDashboard = () => {
     }
   };
 
-const updateProfile = async () => {
-  try {
-    console.log("Saving profile...", profileForm); // DEBUG
-
-    const res = await fetch(`${API_BASE_URL}/student/profile`, {
-      method: "PUT",
-      headers: {
-        ...authHeaders,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(profileForm),
-    });
-
-    if (!res.ok) {
-      throw new Error("Failed to update profile");
+  const fetchProfile = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/student/profile`, {
+        headers: authHeaders,
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setProfile(data);
+      }
+    } catch (error) {
+      console.error("Error fetching profile:", error);
     }
+  };
 
-    const data = await res.json();
-    setProfile(data);
-    setShowProfileModal(false);
-  } catch (err) {
-    console.error("Profile update error:", err);
-    alert("Failed to save profile");
-  }
-};
+  const fetchMenu = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/menu`, {
+        headers: authHeaders,
+      });
 
+      if (!res.ok) return;
 
-  // const fetchMenu = async () => {
-  //   try {
-  //     const response = await fetch(`${API_BASE_URL}/menu`, {
-  //       headers: authHeaders
-  //     });
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       if (data && data.length > 0) {
-  //         const today = getDayOfWeek().toUpperCase();
-  //         const todayMenu = data.find(m => m.day === today);
-  //         setMenuData(todayMenu || data[0]);
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching menu:', error);
-  //   }
-  // };
+      const data = await res.json();
+
+      // menu for hostel (only one object)
+      const hostelMenu = data[0];
+
+      // get today in BACKEND format
+      const today = new Date()
+        .toLocaleDateString("en-US", {
+          weekday: "long",
+        })
+        .toUpperCase(); // MONDAY, TUESDAY...
+
+      // extract meals of today
+      const todayMeals = hostelMenu.meals[today];
+
+      setMenuData({
+        day: today,
+        meals: todayMeals,
+      });
+    } catch (err) {
+      console.error("Menu fetch failed", err);
+    }
+  };
 
   const fetchMyComplaints = async () => {
     try {
@@ -280,47 +279,6 @@ const updateProfile = async () => {
     (c) => c.status === "RESOLVED"
   ).length;
 
-  const submitPreference = async () => {
-    // if (!preferenceForm.scheduleType || !preferenceForm.cleanlinessLevel ||
-    //     !preferenceForm.noisePreference || !preferenceForm.studyPreference ||
-    //     !preferenceForm.allergy || !preferenceForm.roomType ||        !preferenceForm.roomTempPreference) {
-    //   alert("Please fill all fields");
-    //   return;
-    // }
-
-    try {
-      const res = await fetch(`${API_BASE_URL}/preference`, {
-        method: "POST",
-        headers: authHeaders,
-        body: JSON.stringify(preferenceForm),
-      });
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Error response:", errorText);
-        alert(
-          "Error occurred. You may have already submitted preferences or your profile is incomplete."
-        );
-        return;
-      }
-
-      alert("Preferences saved successfully");
-      setSetPreferenceModal(false);
-      setPreferenceForm({
-        scheduleType: null,
-        cleanlinessLevel: null,
-        noisePreference: null,
-        studyPreference: null,
-        allergy: null,
-        roomTempPreference: null,
-      });
-    } catch (error) {
-      console.log("Error submitting preference", error);
-      alert("Something went wrong");
-    }
-  };
-
-
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm">
@@ -353,29 +311,35 @@ const updateProfile = async () => {
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-1">Dashboard</h2>
         </div>
+        {profile && !isProfileComplete && (
+          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-lg mb-6">
+            <h3 className="font-semibold text-gray-900">
+              Complete Your Profile
+            </h3>
+            <p className="text-sm text-gray-700 mb-2">
+              Please complete your profile to access all hostel services.
+            </p>
+            <button
+              onClick={() => navigate("/student/profile")}
+              className="px-4 py-2 bg-blue-500 text-white rounded text-sm"
+            >
+              Complete Profile
+            </button>
+          </div>
+        )}
 
-        <div className="bg-blue-50 p-4 rounded-lg mb-6 border-l-4 border-blue-500">
+        {/* <div className="bg-blue-50 p-4 rounded-lg mb-6 border-l-4 border-blue-500">
           <div className="flex items-start gap-3">
             <MessageSquare className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <h3 className="text-base font-semibold text-gray-900 mb-1">
-                Find Your Perfect Roommate!
-              </h3>
-              <p className="text-sm text-gray-700 mb-3">
-                Complete your Roommate Preference Form in your profile to start
-                seeing potential matches.
-              </p>
-              <button
-                onClick={() => {
-                  setShowProfileModal(true);
-                }}
-                className="px-4 py-1.5 bg-blue-500 text-white rounded text-sm font-medium hover:bg-blue-600"
-              >
+              <h3 className="text-base font-semibold text-gray-900 mb-1">Find Your Perfect Roommate!</h3>
+              <p className="text-sm text-gray-700 mb-3">Complete your Roommate Preference Form in your profile to start seeing potential matches.</p>
+              <button className="px-4 py-1.5 bg-blue-500 text-white rounded text-sm font-medium hover:bg-blue-600">
                 Go to Profile
               </button>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div className="bg-white rounded-lg shadow-sm mb-6">
           <div className="p-4 bg-orange-50 flex items-center justify-between">
@@ -452,7 +416,6 @@ const updateProfile = async () => {
           <h3 className="text-lg font-bold text-gray-900 mb-4">
             Quick Actions
           </h3>
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div
               className="bg-white rounded-lg shadow-sm p-5 flex flex-col"
@@ -491,14 +454,12 @@ const updateProfile = async () => {
               <p className="text-xs text-center text-gray-500 mb-3">
                 Complete your profile to unlock matches.
               </p>
-              {/*made a setpreferencemodal for this*/}
+
               <button
-                onClick={() => {
-                  setSetPreferenceModal(true);
-                }}
+                onClick={() => navigate("/student/preferences")}
                 className="w-full px-4 py-2 bg-blue-500 text-white rounded text-sm font-medium hover:bg-blue-600 mt-auto"
               >
-                Update Preferences
+                Fill Preferences
               </button>
             </div>
 
@@ -524,7 +485,14 @@ const updateProfile = async () => {
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star
                     key={star}
-                    className="w-8 h-8 text-gray-300 cursor-pointer hover:text-yellow-400"
+                    onClick={() =>
+                      setFeedbackForm({ ...feedbackForm, rating: star })
+                    }
+                    className={`w-8 h-8 cursor-pointer ${
+                      star <= feedbackForm.rating
+                        ? "text-yellow-400 fill-yellow-400"
+                        : "text-gray-300 hover:text-yellow-300"
+                    }`}
                   />
                 ))}
               </div>
@@ -581,187 +549,6 @@ const updateProfile = async () => {
           </div>
         </div>
       </div>
-
-      {setPreferenceModal && (
-        <div className="fixed inset-0 bg-gray-100 bg-opacity-40 flex items-center justify-center p-2 z-50 overflow-y-auto">
-          <div className="bg-white rounded-xl shadow-lg max-w-xl w-full my-7">
-            <div className="p-6 border-b border-gray-200 pb-0 pt-10">
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xl font-bold text-gray-900">
-                  Set Room Preferences
-                </h2>
-                <button
-                  onClick={() => setSetPreferenceModal(false)}
-                  className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 p-1 rounded-full transition-colors"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-              {/* <p className="text-sm text-gray-600">
-                Fill out all fields and save your preferences.
-              </p> */}
-            </div>
-
-            <div className="p-6 space-y-5">
-              <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Schedule Type
-                </label>
-                <select
-                  value={preferenceForm.scheduleType || ""}
-                  onChange={(e) =>
-                    setPreferenceForm({
-                      ...preferenceForm,
-                      scheduleType: e.target.value || null,
-                    })
-                  }
-                  className="w-full px-4 py-2.5 border rounded-lg text-sm"
-                >
-                  <option value="">Select</option>
-                  <option value="MORNING_PERSON">Morning Person</option>
-                  <option value="NIGHT_PERSON">Night Person</option>
-                  <option value="FLEXIBLE">Flexible</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Cleanliness Level
-                </label>
-                <select
-                  value={preferenceForm.cleanlinessLevel || ""}
-                  onChange={(e) =>
-                    setPreferenceForm({
-                      ...preferenceForm,
-                      cleanlinessLevel: e.target.value || null,
-                    })
-                  }
-                  className="w-full px-4 py-2.5 border rounded-lg text-sm"
-                >
-                  <option value="">Select</option>
-                  <option value="HIGH">High</option>
-                  <option value="MEDIUM">Medium</option>
-                  <option value="LOW">Low</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Noise Preference
-                </label>
-                <select
-                  value={preferenceForm.noisePreference || ""}
-                  onChange={(e) =>
-                    setPreferenceForm({
-                      ...preferenceForm,
-                      noisePreference: e.target.value || null,
-                    })
-                  }
-                  className="w-full px-4 py-2.5 border rounded-lg text-sm"
-                >
-                  <option value="">Select</option>
-                  <option value="QUIET">Quiet</option>
-                  <option value="OKAY">Okay</option>
-                  <option value="NOISY">Noisy</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Study Preference
-                </label>
-                <select
-                  value={preferenceForm.studyPreference || ""}
-                  onChange={(e) =>
-                    setPreferenceForm({
-                      ...preferenceForm,
-                      studyPreference: e.target.value || null,
-                    })
-                  }
-                  className="w-full px-4 py-2.5 border rounded-lg text-sm"
-                >
-                  <option value="">Select</option>
-                  <option value="ALONE">Alone</option>
-                  <option value="GROUP">Group</option>
-                  <option value="FLEXIBLE">Flexible</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Allergy
-                </label>
-                <select
-                  value={preferenceForm.allergy || ""}
-                  onChange={(e) =>
-                    setPreferenceForm({
-                      ...preferenceForm,
-                      allergy: e.target.value || null,
-                    })
-                  }
-                  className="w-full px-4 py-2.5 border rounded-lg text-sm"
-                >
-                  <option value="">Select</option>
-                  <option value="DIRT">Dirt</option>
-                  <option value="PERFUME">Perfume</option>
-                  <option value="OTHERS">Others</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Room Temperature
-                </label>
-                <select
-                  value={preferenceForm.roomTempPreference || ""}
-                  onChange={(e) =>
-                    setPreferenceForm({
-                      ...preferenceForm,
-                      roomTempPreference: e.target.value || null,
-                    })
-                  }
-                  className="w-full px-4 py-2.5 border rounded-lg text-sm"
-                >
-                  <option value="">Select</option>
-                  <option value="CHILLED">Chilled</option>
-                  <option value="COOL">Cool</option>
-                  <option value="NORMAL">Normal</option>
-                  <option value="FLEXIBLE">Flexible</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Room Type
-                </label>
-                <select
-                  value={preferenceForm.roomType || ""}
-                  onChange={(e) =>
-                    setPreferenceForm({
-                      ...preferenceForm,
-                      roomType: e.target.value || null,
-                    })
-                  }
-                  className="w-full px-4 py-2.5 border rounded-lg text-sm"
-                >
-                  <option value="">Select</option>
-                  <option value="ONE">One</option>
-                  <option value="TWO">Two</option>
-                  <option value="THREE">Three</option>
-                  <option value="FOUR">Four</option>
-                </select>
-              </div>
-
-              <button
-                onClick={submitPreference}
-                className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-sm"
-              >
-                Save Preferences
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {showComplaintModal && (
         <div className="fixed inset-0 bg-gray-100 bg-opacity-40 flex items-center justify-center p-4 z-50 overflow-y-auto">
@@ -938,124 +725,6 @@ const updateProfile = async () => {
                 className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-sm transition-colors"
               >
                 Submit Feedback
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {showProfileModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-100">
-          <div className="bg-white w-full max-w-lg rounded-xl shadow-lg p-6">
-            {/* Header */}
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">
-                Student Profile
-              </h2>
-              <button
-                onClick={() => setShowProfileModal(false)}
-                className="text-gray-500 text-xl"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Profile Form */}
-            {/* Branch */}
-            <div>
-              <label className="text-sm font-medium text-gray-700">
-                Branch
-              </label>
-              <input
-                type="text"
-                value={profileForm.branch}
-                onChange={(e) =>
-                  setProfileForm({ ...profileForm, branch: e.target.value })
-                }
-                className="w-full mt-1 px-3 py-2 border rounded-md text-sm"
-              />
-            </div>
-
-            {/* Year */}
-            <div>
-              <label className="text-sm font-medium text-gray-700">Year</label>
-              <input
-                type="number"
-                value={profileForm.year}
-                onChange={(e) =>
-                  setProfileForm({ ...profileForm, year: e.target.value })
-                }
-                className="w-full mt-1 px-3 py-2 border rounded-md text-sm"
-              />
-            </div>
-
-            {/* Gender */}
-            <div>
-              <label className="text-sm font-medium text-gray-700">
-                Gender
-              </label>
-              <select
-                value={profileForm.gender}
-                onChange={(e) =>
-                  setProfileForm({ ...profileForm, gender: e.target.value })
-                }
-                className="w-full mt-1 px-3 py-2 border rounded-md text-sm"
-              >
-                <option value="">Select</option>
-                <option value="MALE">Male</option>
-                <option value="FEMALE">Female</option>
-              </select>
-            </div>
-
-            {/* Hostel Type */}
-            <div>
-              <label className="text-sm font-medium text-gray-700">
-                Hostel Type
-              </label>
-              <select
-                value={profileForm.hostelType}
-                onChange={(e) =>
-                  setProfileForm({ ...profileForm, hostelType: e.target.value })
-                }
-                className="w-full mt-1 px-3 py-2 border rounded-md text-sm"
-              >
-                <option value="">Select</option>
-                <option value="BOYS_HOSTEL">Boys Hostel</option>
-                <option value="GIRLS_HOSTEL">Girls Hostel</option>
-              </select>
-            </div>
-
-            {/* Parent Contact */}
-            <div>
-              <label className="text-sm font-medium text-gray-700">
-                Parent Contact No
-              </label>
-              <input
-                type="text"
-                value={profileForm.parentContactNo}
-                onChange={(e) =>
-                  setProfileForm({
-                    ...profileForm,
-                    parentContactNo: e.target.value,
-                  })
-                }
-                className="w-full mt-1 px-3 py-2 border rounded-md text-sm"
-              />
-            </div>
-
-            {/* Footer */}
-            <div className="flex justify-end gap-3 mt-6">
-              <button
-                onClick={() => setShowProfileModal(false)}
-                className="px-4 py-2 border rounded-md text-sm"
-              >
-                Cancel
-              </button>
-
-              <button
-                onClick={updateProfile}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600"
-              >
-                Save
               </button>
             </div>
           </div>

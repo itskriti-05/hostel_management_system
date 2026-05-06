@@ -6,6 +6,8 @@ import DefaultLayout from "./layouts/DefaultLayout.jsx";
 import AuthLayout from "./layouts/AuthLayout.jsx";
 import StudentDashboard from "./pages/StudentDashboard/StudentDashboard";
 import WardenDashboard from "./pages/WardenDashboard/WardenDashboard.jsx";
+import StudentProfile from "./pages/StudentProfile";
+import PreferenceForm from "./pages/PreferenceForm/PreferenceForm";
 
 export default function App() {
   return (
@@ -27,7 +29,7 @@ export default function App() {
             </DefaultLayout>
           }
         />
-
+        <Route path="/student/profile" element={<StudentProfile />} />
         <Route
           path="/login"
           element={
@@ -38,12 +40,20 @@ export default function App() {
         />
 
         <Route
-          path="/student-dashboard"
+          path="/studentDashboard"
           element={
             <AuthLayout>
              
                 <StudentDashboard/>
              
+            </AuthLayout>
+          }
+        />
+         <Route
+          path="/student/preferences"
+          element={
+            <AuthLayout>
+              <PreferenceForm />
             </AuthLayout>
           }
         />

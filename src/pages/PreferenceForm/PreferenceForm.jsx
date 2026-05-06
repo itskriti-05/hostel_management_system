@@ -1,51 +1,50 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function PreferenceForm() {
   const [formData, setFormData] = useState({
-    scheduleType: '',
-    cleanlinessLevel: '',
-    noisePreference: '',
-    studyPreference: '',
-    allergy: '',
-    hobbies: [],
-    roomTempPreference: '',
-    roomType: ''
+    scheduleType: "",
+    cleanlinessLevel: "",
+    noisePreference: "",
+    studyPreference: "",
+    allergy: "",
+    roomTempPreference: "",
+    roomType: "",
   });
-
+  const navigate = useNavigate();
   const [progress, setProgress] = useState(0);
 
   const handleSelectChange = (field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
-    calculateProgress();
   };
-
-  const handleHobbyToggle = (hobby) => {
-    setFormData(prev => ({
-      ...prev,
-      hobbies: prev.hobbies.includes(hobby)
-        ? prev.hobbies.filter(h => h !== hobby)
-        : [...prev.hobbies, hobby]
-    }));
-    calculateProgress();
-  };
-
-  const calculateProgress = () => {
+  useEffect(() => {
     const fields = Object.keys(formData);
-    const filled = fields.filter(key => {
-      if (key === 'hobbies') return formData[key].length > 0;
-      return formData[key] !== '';
-    }).length;
+    const filled = fields.filter((key) => formData[key] !== "").length;
     setProgress((filled / fields.length) * 100);
-  };
+  }, [formData]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Preference Form Submitted:', formData);
-    // Redirect to dashboard or call API
-    window.location.href = '/dashboard';
+
+    const res = await fetch("http://localhost:8080/api/preference", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (!res.ok) {
+      alert("Failed to submit preference");
+      return;
+    }
+
+    alert("Preferences saved successfully!");
+    navigate("/student-dashboard");
   };
 
   return (
@@ -53,20 +52,27 @@ export default function PreferenceForm() {
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">Build Your Roommate Vibe!</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">
+            Build Your Roommate Vibe!
+          </h1>
           <p className="text-gray-600">
-            Let's find your perfect match! Tell us a bit about your style, and we'll connect you with an awesome roommate.
+            Let's find your perfect match! Tell us a bit about your style, and
+            we'll connect you with an awesome roommate.
           </p>
         </div>
 
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-gray-700">Vibe Check Progress</span>
-            <span className="text-sm font-medium text-[#1B3C53]">{Math.round(progress)}%</span>
+            <span className="text-sm font-medium text-gray-700">
+              Vibe Check Progress
+            </span>
+            <span className="text-sm font-medium text-[#1B3C53]">
+              {Math.round(progress)}%
+            </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2.5">
-            <div 
+            <div
               className="bg-[#1B3C53] h-2.5 rounded-full transition-all duration-300"
               style={{ width: `${progress}%` }}
             ></div>
@@ -76,8 +82,10 @@ export default function PreferenceForm() {
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Your Daily Groove */}
           <div className="bg-white rounded-2xl shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Daily Groove</h2>
-            
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              Your Daily Groove
+            </h2>
+
             <div className="grid md:grid-cols-2 gap-6">
               {/* Schedule Type */}
               <div>
@@ -87,7 +95,9 @@ export default function PreferenceForm() {
                 </label>
                 <select
                   value={formData.scheduleType}
-                  onChange={(e) => handleSelectChange('scheduleType', e.target.value)}
+                  onChange={(e) =>
+                    handleSelectChange("scheduleType", e.target.value)
+                  }
                   required
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3C53] bg-gray-50"
                 >
@@ -106,7 +116,9 @@ export default function PreferenceForm() {
                 </label>
                 <select
                   value={formData.cleanlinessLevel}
-                  onChange={(e) => handleSelectChange('cleanlinessLevel', e.target.value)}
+                  onChange={(e) =>
+                    handleSelectChange("cleanlinessLevel", e.target.value)
+                  }
                   required
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3C53] bg-gray-50"
                 >
@@ -125,7 +137,9 @@ export default function PreferenceForm() {
                 </label>
                 <select
                   value={formData.noisePreference}
-                  onChange={(e) => handleSelectChange('noisePreference', e.target.value)}
+                  onChange={(e) =>
+                    handleSelectChange("noisePreference", e.target.value)
+                  }
                   required
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3C53] bg-gray-50"
                 >
@@ -144,7 +158,9 @@ export default function PreferenceForm() {
                 </label>
                 <select
                   value={formData.roomTempPreference}
-                  onChange={(e) => handleSelectChange('roomTempPreference', e.target.value)}
+                  onChange={(e) =>
+                    handleSelectChange("roomTempPreference", e.target.value)
+                  }
                   required
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3C53] bg-gray-50"
                 >
@@ -160,8 +176,10 @@ export default function PreferenceForm() {
 
           {/* Study & Fun Times */}
           <div className="bg-white rounded-2xl shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Study & Fun Times</h2>
-            
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              Study & Fun Times
+            </h2>
+
             {/* Study Preference */}
             <div className="mb-6">
               <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
@@ -170,7 +188,9 @@ export default function PreferenceForm() {
               </label>
               <select
                 value={formData.studyPreference}
-                onChange={(e) => handleSelectChange('studyPreference', e.target.value)}
+                onChange={(e) =>
+                  handleSelectChange("studyPreference", e.target.value)
+                }
                 required
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3C53] bg-gray-50"
               >
@@ -180,36 +200,14 @@ export default function PreferenceForm() {
                 <option value="FLEXIBLE">Either Works</option>
               </select>
             </div>
-
-            {/* Hobbies */}
-            <div>
-              <label className="flex items-center text-sm font-medium text-gray-700 mb-3">
-                <span className="text-pink-500 mr-2">🎨</span>
-                What are you into?
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {['MUSIC', 'CODING', 'DANCE', 'ART', 'READING', 'OUTDOOR_GAMES', 'OTHERS'].map((hobby) => (
-                  <button
-                    key={hobby}
-                    type="button"
-                    onClick={() => handleHobbyToggle(hobby)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                      formData.hobbies.includes(hobby)
-                        ? 'bg-[#1B3C53] text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {hobby.charAt(0) + hobby.slice(1).toLowerCase().replace('_', ' ')}
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
 
           {/* Room & Well-being */}
           <div className="bg-white rounded-2xl shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Room & Well-being</h2>
-            
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              Room & Well-being
+            </h2>
+
             <div className="grid md:grid-cols-2 gap-6">
               {/* Allergies */}
               <div>
@@ -219,7 +217,9 @@ export default function PreferenceForm() {
                 </label>
                 <select
                   value={formData.allergy}
-                  onChange={(e) => handleSelectChange('allergy', e.target.value)}
+                  onChange={(e) =>
+                    handleSelectChange("allergy", e.target.value)
+                  }
                   required
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3C53] bg-gray-50"
                 >
@@ -238,15 +238,17 @@ export default function PreferenceForm() {
                 </label>
                 <select
                   value={formData.roomType}
-                  onChange={(e) => handleSelectChange('roomType', e.target.value)}
+                  onChange={(e) =>
+                    handleSelectChange("roomType", e.target.value)
+                  }
                   required
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3C53] bg-gray-50"
                 >
-                  <option value="">Select...</option>
-                  <option value="SINGLE">A room all to myself</option>
-                  <option value="DOUBLE">Double (2 people)</option>
-                  <option value="TRIPLE">Triple (3 people)</option>
-                  <option value="QUAD">Quad (4 people)</option>
+                  <option value="">Select Room Type</option>
+                  <option value="ONE">Single (1 Person)</option>
+                  <option value="TWO">Double (2 People)</option>
+                  <option value="THREE">Triple (3 People)</option>
+                  <option value="FOUR">Four Sharing</option>
+                  <option value="FIVE">Five Sharing</option>
                 </select>
               </div>
             </div>
